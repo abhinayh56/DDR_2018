@@ -48,16 +48,11 @@ print("4 ---")
 
 
 
+print("========================")
 
 
+import serial.tools.list_ports
 
-# for port in ports:
-#     print(port.device)
-
-
-
-# ser = serial.Serial()
-# ser.baudrate = 9600
-# ser.port = 'COM11'
-# ser.open()
-# ser.close()
+for port in serial.tools.list_ports.comports():
+    if "Bluetooth" in port.description:
+        print(port.device, "-", port.description)

@@ -6,12 +6,14 @@ import time
 ser = serial.Serial()
 ser.baudrate = 9600
 # ser.port = '/dev/rfcomm3'
-ser.port = '/dev/ttyACM0'
+ser.port = 'COM7'
 # ser.timeout = 0.15
 
-ser.open()
+ser.close()
 
-ser.list_ports.comports()
+time.sleep(1)
+
+ser.open()
 
 def crc8(data):
     polynomial = 0x07
@@ -43,9 +45,9 @@ def send_command(pwm_L_, pwm_R_):
 
     try:
         ser.write(tx_pkt)
-        print(pwm_L, ',', pwm_R, '--->')
+        print('---> Tx', pwm_L, ',', pwm_R)
     except:
-        print('XXX, XXX --->')
+        print('---> Tx', 'XXX, XXX')
 
 def receive_command():
     try:
@@ -56,6 +58,7 @@ def receive_command():
         for i in range(0,n):
             if(rx_pkt[i]==44):
                 index_comma.append(i)
+        # print("index_comma: ", index_comma)
 
         hrt_counter_rx = []
         t_millis_rx = []
@@ -64,12 +67,17 @@ def receive_command():
 
         for i in range(0,index_comma[0]):
             hrt_counter_rx.append(rx_pkt[i]-48)
-        for i in range(index_comma[0], index_comma[1]):
+        for i in range(index_comma[0]+1, index_comma[1]):
             t_millis_rx.append(rx_pkt[i]-48)
-        for i in range(index_comma[1], index_comma[2]):
+        for i in range(index_comma[1]+1, index_comma[2]):
             pwm_l_rx.append(rx_pkt[i]-48)
-        for i in range(index_comma[2], index_comma[3]):
+        for i in range(index_comma[2]+1, n-1):
             pwm_r_rx.append(rx_pkt[i]-48)
+
+        # print("hrt_counter_rx: ", hrt_counter_rx)
+        # print("t_millis_rx   : ", t_millis_rx)
+        # print("pwm_l_rx      : ", pwm_l_rx)
+        # print("pwm_r_rx      : ", pwm_r_rx)
 
         hrt_counter_rx_val = 0
         t_millis_rx_val = 0
@@ -88,25 +96,25 @@ def receive_command():
         for i in range(0,len(pwm_r_rx)):
             pwm_r_rx_val = pwm_r_rx_val*10 + pwm_r_rx[i]
 
-        print(rx_pkt, hrt_counter_rx_val, t_millis_rx_val, pwm_l_rx, pwm_r_rx, pwm_l_rx_val , pwm_r_rx_val, '<---')
+        print('<--- Rx', pwm_l_rx_val , pwm_r_rx_val, hrt_counter_rx_val, t_millis_rx_val)
     except:
-        print('XXX, XXX <---', "RX Error!")
+        print('<--- Rx', 'XXX, XXX', "RX Error!")
 
 t0 = time.time()
 
 while 1:
-    v = 0 # -255, 255
-    w = 0 # -255, 255
+    v = int(input("v: ")) # -255, 255
+    w = int(input("w: ")) # -255, 255
 
     Kv = 1.0
     Kw = 1.0
 
-    pwm_L = Kv * v - Kw * w
-    pwm_R = Kv * v + Kw * w
+    pwm_L = int(Kv * v - Kw * w)
+    pwm_R = int(Kv * v + Kw * w)
 
     send_command(pwm_L, pwm_R)
     receive_command()
 
-    time.sleep(0.1)
+    time.sleep(0.075)
 
 ser.close()

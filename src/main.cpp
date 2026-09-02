@@ -29,8 +29,8 @@ byte pkt_rx[10] = {0x15, 0xEC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0xD2};
 byte pkt_rx_crc[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
 uint8_t crc;
 uint64_t pkt_rx_last_valid_time;
-uint64_t comm_out_timeout = 1500; // milliseconds
-uint32_t hrt_counter = 0;		  // high resolution timer counter
+uint64_t comm_out_timeout = 10000; // milliseconds
+uint32_t hrt_counter = 0;		   // high resolution timer counter
 uint64_t tx_pkt_freq = 10;
 uint64_t tx_pkt_counter_trig = static_cast<uint64_t>(static_cast<double>(freq_cyclic_hz) / static_cast<double>(tx_pkt_freq));
 uint64_t tx_pkt_counter = 1;
@@ -93,23 +93,21 @@ void receive_data(int16_t &pwm_L, int16_t &pwm_R)
 
 		byte n = new_msg_available();
 
-		if ((millis() - pkt_rx_last_valid_time) > comm_out_timeout)
+		if (n == 0x00)
 		{
-			pwm_L = 0;
-			pwm_R = 0;
+			pkt_rx_last_valid_time = millis();
+			pwm_L = (((int16_t)pkt_rx[3]) << 8) | pkt_rx[4];
+			pwm_R = (((int16_t)pkt_rx[5]) << 8) | pkt_rx[6];
 		}
 		else
 		{
-			if (n == 0x00)
-			{
-				pkt_rx_last_valid_time = millis();
-				pwm_L = (((int16_t)pkt_rx[3]) << 8) | pkt_rx[4];
-				pwm_R = (((int16_t)pkt_rx[5]) << 8) | pkt_rx[6];
-			}
-			else
-			{
-			}
 		}
+	}
+
+	if ((millis() - pkt_rx_last_valid_time) > comm_out_timeout)
+	{
+		pwm_L = 0;
+		pwm_R = 0;
 	}
 }
 
