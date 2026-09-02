@@ -6,7 +6,7 @@
 
 #include <Arduino.h>
 
-# assign motor pins
+// assign motor pins
 #define ML1 2
 #define ML2 3
 #define MR1 7
@@ -14,19 +14,30 @@
 #define ENL 5
 #define ENR 6
 
-# variable to store pwm of left and right motor
-int16_t pwm_L = 0;
-int16_t pwm_R = 0;
-#define PWM_MAX 190 // @12 Volt
+// cyclic time
+uint64_t freq_cyclic_hz = 100;
+uint64_t t_loop_us = static_cast<uint64_t>(1000000.0 / static_cast<double>(freq_cyclic_hz)); // microseconds
+uint64_t last_loop_time_us = 0;																 // last loop time in microseconds
 
-# define packet structure for communication
+// maximum and command pwm value for motor driver
+int16_t PWM_MAX = 190; // @12 Volt
+int16_t pwm_L;
+int16_t pwm_R;
+
+// define packet structure for communication
 byte pkt_rx[10] = {0x15, 0xEC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0xD2};
 byte pkt_rx_crc[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
 uint8_t crc;
+uint64_t pkt_rx_last_valid_time;
+uint64_t comm_out_timeout = 1500; // milliseconds
+uint32_t hrt_counter = 0;		  // high resolution timer counter
+uint64_t tx_pkt_freq = 10;
+uint64_t tx_pkt_counter_trig = static_cast<uint64_t>(static_cast<double>(freq_cyclic_hz) / static_cast<double>(tx_pkt_freq));
+uint64_t tx_pkt_counter = 1;
 
-# function prototypes
+// function prototypes
 void setup_motor_pins();
-void receive_data();
+void receive_data(int16_t &pwm_L, int16_t &pwm_R);
 byte new_msg_available();
 void send_data();
 void drive_robot(int16_t pwm_L, int16_t pwm_R);
@@ -37,22 +48,39 @@ uint8_t crc8(const uint8_t *data, uint32_t length);
 
 void setup()
 {
-	Serial.begin(9600); # initialize serial communication at 9600 baud rate for bluetooth module
+	Serial.begin(9600); // initialize serial communication at 9600 baud rate for bluetooth module
 
 	setup_motor_pins();
-	drive_robot(0, 0);
+
+	pwm_L = 0;
+	pwm_R = 0;
+
+	drive_robot(pwm_L, pwm_R);
+
+	pkt_rx_last_valid_time = millis();
+	last_loop_time_us = micros();
+	tx_pkt_counter = 1;
 }
 
 void loop()
 {
-	receive_data();
+	receive_data(pwm_L, pwm_R);
 	drive_robot(pwm_L, pwm_R);
-	send_data();
 
-	delay(100);
+	tx_pkt_counter++;
+	if (tx_pkt_counter >= tx_pkt_counter_trig)
+	{
+		send_data();
+		tx_pkt_counter = 1;
+	}
+
+	while (micros() - last_loop_time_us < t_loop_us)
+	{
+	}
+	last_loop_time_us = micros();
 }
 
-void receive_data()
+void receive_data(int16_t &pwm_L, int16_t &pwm_R)
 {
 	while (Serial.available() > 0)
 	{
@@ -65,18 +93,22 @@ void receive_data()
 
 		byte n = new_msg_available();
 
-		switch (n)
+		if ((millis() - pkt_rx_last_valid_time) > comm_out_timeout)
 		{
-		case 0x00:
-			pwm_L = (((int16_t)pkt_rx[3]) << 8) | pkt_rx[4];
-			pwm_R = (((int16_t)pkt_rx[5]) << 8) | pkt_rx[6];
-			break;
-		case 0x01:
-			break;
-		case 0x02:
-			break;
-		default:
-			break;
+			pwm_L = 0;
+			pwm_R = 0;
+		}
+		else
+		{
+			if (n == 0x00)
+			{
+				pkt_rx_last_valid_time = millis();
+				pwm_L = (((int16_t)pkt_rx[3]) << 8) | pkt_rx[4];
+				pwm_R = (((int16_t)pkt_rx[5]) << 8) | pkt_rx[6];
+			}
+			else
+			{
+			}
 		}
 	}
 }
@@ -111,12 +143,16 @@ byte new_msg_available()
 
 void send_data()
 {
-	// Serial.print(((float)millis()/1000.0));
-	// Serial.print(',');
+	Serial.print(hrt_counter);
+	Serial.print(',');
+	Serial.print(millis());
+	Serial.print(',');
 	Serial.print(pwm_L);
 	Serial.print(',');
 	Serial.print(pwm_R);
 	Serial.print('\n');
+
+	hrt_counter++;
 }
 
 void setup_motor_pins()
