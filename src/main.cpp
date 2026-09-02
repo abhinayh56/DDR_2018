@@ -20,7 +20,7 @@ uint64_t t_loop_us = static_cast<uint64_t>(1000000.0 / static_cast<double>(freq_
 uint64_t last_loop_time_us = 0;																 // last loop time in microseconds
 
 // maximum and command pwm value for motor driver
-int16_t PWM_MAX = 250; // @12 Volt
+int16_t PWM_MAX = 225; // @12 Volt
 int16_t pwm_L;
 int16_t pwm_R;
 
