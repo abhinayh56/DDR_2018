@@ -28,6 +28,7 @@ def crc8(data):
     return crc & 0xFF
 
 def send_command(pwm_L_, pwm_R_):
+    print("pwm_L_: ", pwm_L_)
     pwm_L = pwm_L_ & (0b1111111111111111)
     pwm_R = pwm_R_ & (0b1111111111111111)
 
@@ -45,11 +46,12 @@ def send_command(pwm_L_, pwm_R_):
 
     try:
         ser.write(tx_pkt)
-        print('---> Tx', pwm_L, ',', pwm_R)
+        print('---> Tx : ', pwm_L_, ',', pwm_R_)
     except:
-        print('---> Tx', 'XXX, XXX')
+        print('---> Tx : ', 'XXX, XXX')
 
 def receive_command():
+    ser.flushInput()
     try:
         rx_pkt = ser.readline()
         rx_pkt = list(rx_pkt)
@@ -97,21 +99,21 @@ def receive_command():
             pwm_r_rx_val = pwm_r_rx_val*10 + pwm_r_rx[i]
 
         # print('<--- Rx', pwm_l_rx_val , pwm_r_rx_val, hrt_counter_rx_val, t_millis_rx_val)
-        print('<--- Rx', pwm_l_rx_val , pwm_r_rx_val, hrt_counter_rx_val)
+        print('<--- Rx : ', pwm_l_rx, ',' , pwm_r_rx, '                                     ,', hrt_counter_rx_val)
     except:
-        print('<--- Rx', 'XXX, XXX', "RX Error!")
+        print('<--- Rx : ', 'XXX, XXX', "RX Error!")
 
 t0 = time.time()
 
 while 1:
-    v = int(input("v: ")) # -255, 255
-    w = int(input("w: ")) # -255, 255
+    # v = int(input("v: ")) # -255, 255
+    # w = int(input("w: ")) # -255, 255
 
     Kv = 1.0
     Kw = 1.0
 
-    pwm_L = int(Kv * v - Kw * w)
-    pwm_R = int(Kv * v + Kw * w)
+    pwm_L = int(input("pwm_L: ")) # int(Kv * v - Kw * w)
+    pwm_R = int(input("pwm_R: ")) # int(Kv * v + Kw * w)
 
     send_command(pwm_L, pwm_R)
     receive_command()

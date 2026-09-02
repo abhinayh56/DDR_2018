@@ -40,9 +40,9 @@ void setup_motor_pins();
 void receive_data(int16_t &pwm_L, int16_t &pwm_R);
 byte new_msg_available();
 void send_data();
-void drive_robot(int16_t pwm_L, int16_t pwm_R);
-void drive_motor_L(int16_t pwm);
-void drive_motor_R(int16_t pwm);
+void drive_robot(int16_t &pwm_L_, int16_t &pwm_R_);
+void drive_motor_L(int16_t &pwm);
+void drive_motor_R(int16_t &pwm);
 int16_t saturate(int16_t x, int16_t x_min, int16_t x_max);
 uint8_t crc8(const uint8_t *data, uint32_t length);
 
@@ -163,13 +163,13 @@ void setup_motor_pins()
 	pinMode(ENR, OUTPUT);
 }
 
-void drive_robot(int16_t pwm_L_, int16_t pwm_R_)
+void drive_robot(int16_t &pwm_L_, int16_t &pwm_R_)
 {
 	drive_motor_L(pwm_L_);
 	drive_motor_R(pwm_R_);
 }
 
-void drive_motor_L(int16_t pwm)
+void drive_motor_L(int16_t &pwm)
 {
 	pwm = saturate(pwm, -PWM_MAX, PWM_MAX);
 	if (pwm >= 0)
@@ -186,7 +186,7 @@ void drive_motor_L(int16_t pwm)
 	}
 }
 
-void drive_motor_R(int16_t pwm)
+void drive_motor_R(int16_t &pwm)
 {
 	pwm = saturate(pwm, -PWM_MAX, PWM_MAX);
 	if (pwm >= 0)
