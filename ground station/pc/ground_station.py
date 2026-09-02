@@ -11,6 +11,8 @@ ser.port = '/dev/ttyACM0'
 
 ser.open()
 
+ser.list_ports.comports()
+
 def crc8(data):
     polynomial = 0x07
     crc = 0x00
