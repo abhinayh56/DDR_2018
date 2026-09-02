@@ -20,8 +20,6 @@ int16_t pwm_R = 0;
 byte pkt_rx[10] = {0x15, 0xEC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0xD2};
 byte pkt_rx_crc[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
 uint8_t crc;
-bool robot_init = false;
-bool timeout = false;
 
 void setup_motor_pins();
 void receive_data();
@@ -54,8 +52,6 @@ void receive_data()
 	while (Serial.available() > 0)
 	{
 		byte b = Serial.read();
-		// Serial.write(b);
-		// {0x15, 0xEC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0xD2}
 		for (int i = 0; i < 9; i++)
 		{
 			pkt_rx[i] = pkt_rx[i + 1];
