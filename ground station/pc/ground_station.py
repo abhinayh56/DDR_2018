@@ -93,8 +93,8 @@ def receive_command():
 t0 = time.time()
 
 while 1:
-    pwm_L = 170*0
-    pwm_R = 119*0
+    pwm_L = 0
+    pwm_R = 0
     send_command(pwm_L, pwm_R)
     receive_command()
 
