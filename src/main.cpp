@@ -6,6 +6,7 @@
 
 #include <Arduino.h>
 
+# assign motor pins
 #define ML1 2
 #define ML2 3
 #define MR1 7
@@ -13,14 +14,17 @@
 #define ENL 5
 #define ENR 6
 
+# variable to store pwm of left and right motor
 int16_t pwm_L = 0;
 int16_t pwm_R = 0;
 #define PWM_MAX 190 // @12 Volt
 
+# define packet structure for communication
 byte pkt_rx[10] = {0x15, 0xEC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0xD2};
 byte pkt_rx_crc[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
 uint8_t crc;
 
+# function prototypes
 void setup_motor_pins();
 void receive_data();
 byte new_msg_available();
@@ -33,7 +37,8 @@ uint8_t crc8(const uint8_t *data, uint32_t length);
 
 void setup()
 {
-	Serial.begin(9600);
+	Serial.begin(9600); # initialize serial communication at 9600 baud rate for bluetooth module
+
 	setup_motor_pins();
 	drive_robot(0, 0);
 }
