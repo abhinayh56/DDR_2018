@@ -96,7 +96,8 @@ def receive_command():
         for i in range(0,len(pwm_r_rx)):
             pwm_r_rx_val = pwm_r_rx_val*10 + pwm_r_rx[i]
 
-        print('<--- Rx', pwm_l_rx_val , pwm_r_rx_val, hrt_counter_rx_val, t_millis_rx_val)
+        # print('<--- Rx', pwm_l_rx_val , pwm_r_rx_val, hrt_counter_rx_val, t_millis_rx_val)
+        print('<--- Rx', pwm_l_rx_val , pwm_r_rx_val, hrt_counter_rx_val)
     except:
         print('<--- Rx', 'XXX, XXX', "RX Error!")
 
