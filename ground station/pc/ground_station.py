@@ -93,8 +93,16 @@ def receive_command():
 t0 = time.time()
 
 while 1:
-    pwm_L = 0
-    pwm_R = 0
+    v = 0 # -255, 255
+    w = 0 # -255, 255
+
+    Kv = 1.0
+    Kw = 1.0
+
+    pwm_L = Kv * v - Kw * w
+    pwm_R = Kv * v + Kw * w
+
+    
     send_command(pwm_L, pwm_R)
     receive_command()
 
