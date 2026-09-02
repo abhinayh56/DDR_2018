@@ -41,7 +41,7 @@ def send_command(pwm_L_, pwm_R_):
 
     try:
         ser.write(tx_pkt)
-        print(pwm_L_, ',', pwm_R_, '--->')
+        print(pwm_L, ',', pwm_R, '--->')
     except:
         print('XXX, XXX --->')
 
@@ -49,31 +49,44 @@ def receive_command():
     try:
         rx_pkt = ser.readline()
         rx_pkt = list(rx_pkt)
-        index_comma = 0
+        index_comma = []
         n = len(rx_pkt)
         for i in range(0,n):
             if(rx_pkt[i]==44):
-                index_comma = i
-                break
-        
-        pwl = []
-        pwr = []
+                index_comma.append(i)
 
-        for i in range(0,index_comma):
-            pwl.append(rx_pkt[i]-48)
-        for i in range(index_comma+1, n-1):
-            pwr.append(rx_pkt[i]-48)
-        
-        pl = 0
-        pr = 0
-        
-        for i in range(0,len(pwl)):
-            pl = pl*10 + pwl[i]
-        
-        for i in range(0,len(pwr)):
-            pr = pr*10 + pwr[i]
+        hrt_counter_rx = []
+        t_millis_rx = []
+        pwm_l_rx = []
+        pwm_r_rx = []
 
-        print(rx_pkt, pwl, pwr, pl , pr, '<---')
+        for i in range(0,index_comma[0]):
+            hrt_counter_rx.append(rx_pkt[i]-48)
+        for i in range(index_comma[0], index_comma[1]):
+            t_millis_rx.append(rx_pkt[i]-48)
+        for i in range(index_comma[1], index_comma[2]):
+            pwm_l_rx.append(rx_pkt[i]-48)
+        for i in range(index_comma[2], index_comma[3]):
+            pwm_r_rx.append(rx_pkt[i]-48)
+
+        hrt_counter_rx_val = 0
+        t_millis_rx_val = 0
+        pwm_l_rx_val = 0
+        pwm_r_rx_val = 0
+
+        for i in range(0,len(hrt_counter_rx)):
+            hrt_counter_rx_val = hrt_counter_rx_val*10 + hrt_counter_rx[i]
+
+        for i in range(0,len(t_millis_rx)):
+            t_millis_rx_val = t_millis_rx_val*10 + t_millis_rx[i]
+        
+        for i in range(0,len(pwm_l_rx)):
+            pwm_l_rx_val = pwm_l_rx_val*10 + pwm_l_rx[i]
+        
+        for i in range(0,len(pwm_r_rx)):
+            pwm_r_rx_val = pwm_r_rx_val*10 + pwm_r_rx[i]
+
+        print(rx_pkt, hrt_counter_rx_val, t_millis_rx_val, pwm_l_rx, pwm_r_rx, pwm_l_rx_val , pwm_r_rx_val, '<---')
     except:
         print('XXX, XXX <---', "RX Error!")
 
