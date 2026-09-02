@@ -102,7 +102,6 @@ while 1:
     pwm_L = Kv * v - Kw * w
     pwm_R = Kv * v + Kw * w
 
-    
     send_command(pwm_L, pwm_R)
     receive_command()
 
