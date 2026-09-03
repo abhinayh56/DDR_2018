@@ -159,11 +159,11 @@ while running:
 
     if keys[pygame.K_LEFT]:
         print("LEFT")
-        w = w + 25
+        w = w + 50
 
     if keys[pygame.K_RIGHT]:
         print("RIGHT")
-        w = w - 25
+        w = w - 50
 
     v = limit(v, -255, 255)
     w = limit(w, -255, 255)
