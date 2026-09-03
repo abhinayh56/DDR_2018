@@ -76,11 +76,6 @@ def receive_command():
         for i in range(index_comma[2]+1, n-1):
             pwm_r_rx.append(rx_pkt[i]-48)
 
-        # print("hrt_counter_rx: ", hrt_counter_rx)
-        # print("t_millis_rx   : ", t_millis_rx)
-        # print("pwm_l_rx      : ", pwm_l_rx)
-        # print("pwm_r_rx      : ", pwm_r_rx)
-
         hrt_counter_rx_val = 0
         t_millis_rx_val = 0
         pwm_l_rx_val = 0
@@ -91,29 +86,41 @@ def receive_command():
 
         for i in range(0,len(t_millis_rx)):
             t_millis_rx_val = t_millis_rx_val*10 + t_millis_rx[i]
-        
-        for i in range(0,len(pwm_l_rx)):
-            pwm_l_rx_val = pwm_l_rx_val*10 + pwm_l_rx[i]
-        
-        for i in range(0,len(pwm_r_rx)):
-            pwm_r_rx_val = pwm_r_rx_val*10 + pwm_r_rx[i]
 
-        # print('<--- Rx', pwm_l_rx_val , pwm_r_rx_val, hrt_counter_rx_val, t_millis_rx_val)
-        print('<--- Rx : ', pwm_l_rx, ',' , pwm_r_rx, '                                     ,', hrt_counter_rx_val)
+        pwm_l_rx_is_negative = False
+        for i in range(0,len(pwm_l_rx)):
+            if(pwm_l_rx[i]==(-3)):
+                pwm_l_rx_is_negative = True
+                continue
+            pwm_l_rx_val = pwm_l_rx_val*10 + pwm_l_rx[i]
+        if(pwm_l_rx_is_negative == True):
+            pwm_l_rx_val = -1 * pwm_l_rx_val
+
+        pwm_r_rx_is_negative = False
+        for i in range(0,len(pwm_r_rx)):
+            if(pwm_r_rx[i]==(-3)):
+                pwm_r_rx_is_negative = True
+                continue
+            pwm_r_rx_val = pwm_r_rx_val*10 + pwm_r_rx[i]
+        if(pwm_r_rx_is_negative == True):
+            pwm_r_rx_val = -1 * pwm_r_rx_val
+
+        print('<--- Rx : ', pwm_l_rx_val, ',' , pwm_r_rx_val, ",                 " , hrt_counter_rx_val, ",     ", t_millis_rx_val)
+
     except:
         print('<--- Rx : ', 'XXX, XXX', "RX Error!")
 
 t0 = time.time()
 
 while 1:
-    # v = int(input("v: ")) # -255, 255
-    # w = int(input("w: ")) # -255, 255
+    v = int(input("v: ")) # -255, 255
+    w = int(input("w: ")) # -255, 255
 
     Kv = 1.0
     Kw = 1.0
 
-    pwm_L = int(input("pwm_L: ")) # int(Kv * v - Kw * w)
-    pwm_R = int(input("pwm_R: ")) # int(Kv * v + Kw * w)
+    pwm_L = int(Kv * v - Kw * w)
+    pwm_R = int(Kv * v + Kw * w)
 
     send_command(pwm_L, pwm_R)
     receive_command()
