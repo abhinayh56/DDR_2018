@@ -1,12 +1,25 @@
-print('GCS DDR2019')
+print('GCS DDR2018')
 
-import serial
 import time
+import serial
+import serial.tools.list_ports
+
+port = ""
+
+print("===")
+print("Available serial ports:")
+port_list = []
+for i, port in enumerate(serial.tools.list_ports.comports()):
+    print("    ", i + 1 , ". ", port.device, "-", port.description)
+    port_list.append(port.device)
+
+user_input = int(input("Select the serial port to connect to the DDR2018 robot. (Enter the number corresponding to the port): "))
+port_name = port_list[user_input - 1]
 
 ser = serial.Serial()
 ser.baudrate = 9600
 # ser.port = '/dev/rfcomm3'
-ser.port = 'COM7'
+ser.port = port_name
 # ser.timeout = 0.15
 
 ser.close()
@@ -14,6 +27,8 @@ ser.close()
 time.sleep(1)
 
 ser.open()
+
+print("===")
 
 def crc8(data):
     polynomial = 0x07
@@ -112,12 +127,25 @@ def receive_command():
 
 t0 = time.time()
 
+v, w = int(0), int(0)
+
 while 1:
-    v = int(input("v: ")) # -255, 255
-    w = int(input("w: ")) # -255, 255
+    v_input = input("v: ") # -255, 255
+    w_input = input("w: ") # -255, 255
+
+    if((v_input == "q") or (w_input == "q")):
+        send_command(int(0), int(0))
+        time.sleep(0.25)
+        break
+
+    try:
+        v = int(v_input) # -255, 255
+        w = int(w_input) # -255, 255
+    except:
+        pass
 
     Kv = 1.0
-    Kw = 1.0
+    Kw = 0.5
 
     pwm_L = int(Kv * v - Kw * w)
     pwm_R = int(Kv * v + Kw * w)
@@ -125,6 +153,6 @@ while 1:
     send_command(pwm_L, pwm_R)
     receive_command()
 
-    time.sleep(0.075)
+    time.sleep(0.01)
 
 ser.close()
