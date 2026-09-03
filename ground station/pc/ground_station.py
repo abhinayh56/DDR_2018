@@ -149,21 +149,24 @@ while running:
     # Get current keyboard state
     keys = pygame.key.get_pressed()
 
+    dv = 25
+    dw = 25
+
     if keys[pygame.K_UP]:
         print("UP")
-        v = v + 25
+        v = v + dv
 
     if keys[pygame.K_DOWN]:
         print("DOWN")
-        v = v - 25
+        v = v - dv
 
     if keys[pygame.K_LEFT]:
         print("LEFT")
-        w = w + 50
+        w = w + dw
 
     if keys[pygame.K_RIGHT]:
         print("RIGHT")
-        w = w - 50
+        w = w - dw
 
     v = limit(v, -255, 255)
     w = limit(w, -255, 255)
@@ -187,7 +190,7 @@ while running:
     #     pass
 
     Kv = 1.0
-    Kw = 0.5
+    Kw = 1.0
 
     pwm_L = int(Kv * v - Kw * w)
     pwm_R = int(Kv * v + Kw * w)
@@ -195,7 +198,7 @@ while running:
     send_command(pwm_L, pwm_R)
     receive_command()
 
-    pygame.time.Clock().tick(60)
+    pygame.time.Clock().tick(25)
     time.sleep(0.01)
 
 pygame.quit()
