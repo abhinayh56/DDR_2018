@@ -1,6 +1,7 @@
 print('GCS DDR2018')
 
 import time
+import pygame
 import serial
 import serial.tools.list_ports
 
@@ -30,6 +31,11 @@ ser.open()
 
 print("===")
 
+pygame.init()
+screen = pygame.display.set_mode((400, 300))
+pygame.display.set_caption("Keyboard Input")
+running = True
+
 def crc8(data):
     polynomial = 0x07
     crc = 0x00
@@ -42,8 +48,10 @@ def crc8(data):
                 crc <<= 1
     return crc & 0xFF
 
+def limit(n, min_val, max_val):
+    return max(min_val, min(n, max_val))
+
 def send_command(pwm_L_, pwm_R_):
-    print("pwm_L_: ", pwm_L_)
     pwm_L = pwm_L_ & (0b1111111111111111)
     pwm_R = pwm_R_ & (0b1111111111111111)
 
@@ -129,20 +137,54 @@ t0 = time.time()
 
 v, w = int(0), int(0)
 
-while 1:
-    v_input = input("v: ") # -255, 255
-    w_input = input("w: ") # -255, 255
+while running:
+    v_input = "0"
+    w_input = "0"
 
-    if((v_input == "q") or (w_input == "q")):
+    # Process pygame events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Get current keyboard state
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_UP]:
+        print("UP")
+        v = v + 25
+
+    if keys[pygame.K_DOWN]:
+        print("DOWN")
+        v = v - 25
+
+    if keys[pygame.K_LEFT]:
+        print("LEFT")
+        w = w + 25
+
+    if keys[pygame.K_RIGHT]:
+        print("RIGHT")
+        w = w - 25
+
+    v = limit(v, -255, 255)
+    w = limit(w, -255, 255)
+
+    # ESC to quit
+    if keys[pygame.K_ESCAPE]:
+        running = False
+
+    # v_input = input("v: ") # -255, 255
+    # w_input = input("w: ") # -255, 255
+
+    if((v_input == "q") or (w_input == "q") or (running == False)):
         send_command(int(0), int(0))
         time.sleep(0.25)
         break
 
-    try:
-        v = int(v_input) # -255, 255
-        w = int(w_input) # -255, 255
-    except:
-        pass
+    # try:
+    #     v = int(v_input) # -255, 255
+    #     w = int(w_input) # -255, 255
+    # except:
+    #     pass
 
     Kv = 1.0
     Kw = 0.5
@@ -153,6 +195,8 @@ while 1:
     send_command(pwm_L, pwm_R)
     receive_command()
 
+    pygame.time.Clock().tick(60)
     time.sleep(0.01)
 
+pygame.quit()
 ser.close()
