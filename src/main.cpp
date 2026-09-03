@@ -29,7 +29,7 @@ byte pkt_rx[10] = {0x15, 0xEC, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0xD2};
 byte pkt_rx_crc[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
 uint8_t crc;
 uint64_t pkt_rx_last_valid_time;
-uint64_t comm_out_timeout = 10000; // milliseconds
+uint64_t comm_out_timeout = 5000; // milliseconds
 uint32_t hrt_counter = 0;		   // high resolution timer counter
 uint64_t tx_pkt_freq = 10;
 uint64_t tx_pkt_counter_trig = static_cast<uint64_t>(static_cast<double>(freq_cyclic_hz) / static_cast<double>(tx_pkt_freq));
