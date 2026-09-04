@@ -49,6 +49,11 @@ pip install -r requirements.txt
 ```
 
 6. Run the python script *ground_station.py*
+7. The robot is controlled by following four keyboard arrow buttons
+    1. Up arrow key: Forward
+    2. Down arrow key: Reverse
+    3. Left arrow key: Turn left
+    4. Tight arrow key: Turn right
 
 ## Instructions for android phone ground station
 **Note:** The above applicaiton were build for old version of android os. It might not work on current version.
