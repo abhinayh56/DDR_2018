@@ -62,25 +62,3 @@ pip install -r requirements.txt
     2. DDR_bluetooth_transmitter_V1.0.apk
 2. Try installing both *DDR_bluetooth_transmitter_V0.0.apk* and run the application
 3. If step 2 does not work try installing and running *DDR_bluetooth_transmitter_V1.0.apk*.
-
-```sh
-cd /
-mkdir -p catkin_ws/src
-cd /catkin_ws/src
-catkin_crate_pkg turtlesim_test
-cd ..
-catkin make
-```
-
-```C++
-#include <iostream>
-
-using namespace std;
-
-int main()
-{
-    cout << "This is boilerplate for C++" << endl;
-
-    return 0;
-}
-```
