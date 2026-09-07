@@ -1,7 +1,5 @@
 /*
-  Project: DDR2019
-  Arduino Uno and Bluetooth serial communication
-  Input is given from ground station
+  Project: DDR_2018
 */
 
 #include <Arduino.h>
@@ -30,7 +28,7 @@ byte pkt_rx_crc[5] = {0x00, 0x00, 0x00, 0x00, 0x00};
 uint8_t crc;
 uint64_t pkt_rx_last_valid_time;
 uint64_t comm_out_timeout = 5000; // milliseconds
-uint32_t hrt_counter = 0;		   // high resolution timer counter
+uint32_t hrt_counter = 0;		  // high resolution timer counter
 uint64_t tx_pkt_freq = 10;
 uint64_t tx_pkt_counter_trig = static_cast<uint64_t>(static_cast<double>(freq_cyclic_hz) / static_cast<double>(tx_pkt_freq));
 uint64_t tx_pkt_counter = 1;
